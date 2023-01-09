@@ -1,6 +1,6 @@
 import type { Component } from 'solid-js';
 import Search from './Search';
-import { Configuration, OpenAIApi } from "openai";
+
 
 import type {
   ISearchRepository
@@ -9,33 +9,13 @@ import type {
 
 
 const App: Component = () => {
-  const configuration = new Configuration({
-    apiKey: import.meta.env.VITE_OPEN_AI_API_KEY,
-  });
-
-  const openAiClient = new OpenAIApi(configuration);
   const SearchRepository: ISearchRepository = {
     search: async (prompt) => {
-      const response = await openAiClient.createCompletion({
-        model: "text-davinci-003",
-        temperature: 0.9,
-        max_tokens: 800,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        prompt,
-        stop: ["Human:", "AI:"],
-      })
-      const urlMatches = response.data.choices[0].text?.match(/\bhttps?:\/\/\S+/gi) || []; // Iterate over each URL to get their body HTML 
-      urlMatches.forEach(async url => {
-        try {
-        } catch {
-          console.log("error")
-        }
+      const response = await fetch("/.netlify/functions/openAi", {
+        method: "POST",
+        body: JSON.stringify({ prompt }),
       });
-      console.log(response.data.choices[0].text?.split('\n'))
-
-      return response;
+      return response.json();
     }
   }
   return (
@@ -43,7 +23,7 @@ const App: Component = () => {
       display: "flex",
       "flex-direction": "column",
       margin: "3rem",
-    }}>
+    }} >
       <div style={{
         height: "100%",
         width: "100%",
@@ -57,7 +37,7 @@ const App: Component = () => {
       </div>
       <Search client={SearchRepository} />
 
-    </div>
+    </div >
   );
 };
 
