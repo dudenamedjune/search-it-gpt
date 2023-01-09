@@ -52,7 +52,7 @@ function Search({
     }
     const handleBlur = async ({ currentTarget: { value } }: { currentTarget: HTMLInputElement }, index: number) => {
 
-        if (!value && searchValues().length > 1) {
+        if (!value && (searchValues().length > 1) && searchValues()[index + 1]?.term === "") {
             const newSearchValues = [...searchValues()]
             newSearchValues.splice(index, 1)
             setSearchValues(newSearchValues)
